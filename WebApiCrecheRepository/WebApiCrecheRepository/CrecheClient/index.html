@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <style>
+        table, th, td {
+            border: 1px solid black;
+        }
+    </style>
+
+    <title>Creche Details</title>
+    <h2>Children Enlisted</h2>
+    <link href="../../Content/Site.css" rel="stylesheet" />
+    <script src="../../Scripts/jquery-1.10.2.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        // The root URL for the RESTful services
+        var rootURL = "http://localhost:18580/api/creche/";
+
+        // Load and display the list
+        $(document).ready(function () {
+            displayList();
+        });
+
+        // Display the list
+        function displayList() {
+            // Send an AJAX request
+            $('#CrecheTablebodyDetails').empty(); // clear previous table content
+            $.getJSON('/api/creche', function (allCreches) {
+                $(allCreches).each(function (i, item) {
+                    $('#CrecheTableDetails').append('<tr><td>' + item.ChildName +
+                        '</td><td>' + item.ChildAddress +
+                        '</td><td>' + item.GuardianName +
+                        '</td><td>' + item.TelNumber +
+                        '</td><td>' + item.MobileNumber +
+                        '</td><td>' + item.EmergencyNumber +
+                        '</td><td>' + item.Email +
+                        '</td><tr>');
+                });
+                $("childCreate").hide();
+                $("#crecheList").show();
+            });
+        }
+
+
+        // Display the Child CREATE Form
+        function createChildForm() {
+            $("#childList").hide();
+            $("#childCreate").show();
+        }
+
+        // Called with "createForm" onSubmit
+        function createChild() {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: rootURL,
+                dataType: "json",
+                data: formToJSONCreate(),
+                success: function (data, textStatus, jqXHR) {
+                    console.log('Child record created successfully');
+                    clearCreateForm();
+                    displayList();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('Child record create error: ' + textStatus + " " + errorThrown);
+                }
+            });
+        }
+
+        // ensures Create form is blank
+        function clearCreateForm() {
+            $('#idCreate').val('');
+            $('#childNameCreate').val('');
+            $('#childAddressCreate').val('');
+            $('#guardianNameCreate').val('');
+            $('#telephoneNumberCreate').val('');
+            $('#mobileNumberCreate').val('');
+            $('#emergencyNumberCreate').val('');
+            $('#emailAddressCreate').val('');
+        }
+
+        // Helper function for CREATE to serialize all the form fields into a JSON string
+        function formToJSONCreate() {
+            return JSON.stringify({
+            "childName": $('#childNameCreate').val(),
+            "childAddressCreate": $('#childAddressCreate').val(),
+            "guardianNameCreate": $('#guardianNameCreate').val(),
+            "telephoneNumberCreate": $('#telephoneNumberCreate').val(),
+            "mobileNumberCreate": $('#mobileNumberCreate').val(),
+            "emergencyNumberCreate": $('#emergencyNumberCreate').val(),
+            "emailAddressCreate": $('#emailAddressCreate').val(),
+
+            });
+        }
+
+
+    </script>
+
+</head>
+
+<body id="body">
+
+    <!--  Visible when the list of children is displayed -->
+    <div id="crecheList">
+        <h3>Creche List</h3>
+        <table style="width:50%; text-align:left; color:black" ; table-layout: auto; id="CrecheTableDetails">
+            <thead>
+                <tr> <th>Child Name</th> <th>Address</th> <th>Guardian Name</th> <th>Tel Number</th> <th>Mobile Number</th> <th>Emergency Number</th><th>Email</th> </tr>
+            </thead>
+            <tbody id="CrecheTablebodyDetails"></tbody>
+        </table>
+        <br />
+        <div>
+            <input type="button" id="btnCreateClick" value="Add Child Record" onclick="createChildForm()" />
+        </div>
+    </div>
+
+    <!--  Visible when a child record is being created -->
+    <div id="childCreate">
+        <h3>Create Child Record</h3>
+        <form name="createForm">
+            <!--   <input type="hidden" name="id" id="id">  -->
+            childName: <input type="text" name="childNameCreate" id="childNameCreate"><br /><br />
+            childAddress: <input type="text" name="childAddressCreate" id="childAddressCreate"><br /><br />
+            guardianName: <input type="text" name="guardianNameCreate" id="guardianNameCreate"><br /><br />
+            telephoneNumber: <input type="text" name="telephoneNumberCreate" id="telephoneNumberCreate"><br /><br />
+            mobileNumber: <input type="text" name="mobileNumberCreate" id="mobileNumberCreate"><br /><br />
+            emergencyNumber: <input type="text" name="emergencyNumberCreate" id="emergencyNumberCreate"><br /><br />
+            emailAddress: <input type="text" name="emailAddressCreate" id="emailAddressCreate"><br /><br />
+
+            <input type="button" value="Create" onclick="createChild()">
+            <input type="button" id="btnclick" value="Cancel" onclick="displayList(); " />
+        </form>
+    </div>
+
+
+
+</body>
+
+</html>
